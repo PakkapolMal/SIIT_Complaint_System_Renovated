@@ -4,6 +4,7 @@ require_once 'config.php';
 $response = ['success' => false, 'message' => ''];
 
 header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
 
 try {
     if ($conn->connect_error) {
