@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import { AuthContext } from '../contexts.js'; 
+import React from 'react';
+import { useAuth } from '../contexts/AuthProvider';
 
 const AuthHeader = () => {
     // We get all the auth info from the context
-    const { roleLabel, handleLogout } = useContext(AuthContext);
+    const { roleLabel, handleLogout } = useAuth();
 
     return (
         <header className="flex justify-between items-center p-4 bg-white shadow-md">

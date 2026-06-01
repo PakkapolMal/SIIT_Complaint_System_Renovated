@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AuthHeader from './AuthHeader';
+import { fetchSubmissionDetails, getErrorMessage } from '../lib/complaintsService';
+
+function isImageSource(value) {
+  if (!value) {
+    return false;
+  }
+
+  return /\.(jpg|jpeg|png|webp|gif)$/i.test(value) || value.startsWith('http');
+}
 
 const SubmissionDetail = () => {
     const { submissionID } = useParams();
@@ -13,28 +22,19 @@ const SubmissionDetail = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchDetails = async () => {
-            try {
-                const response = await fetch(`http://localhost/siit-complaint-system/backend/getSubmissionDetails.php?id=${submissionID}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+        fetchSubmissionDetails(submissionID)
+            .then((data) => {
+                if (!data) {
+                    setError('Submission not found.');
+                    return;
                 }
-                const data = await response.json();
 
-                if (data.success) {
-                    setSubmission(data.details);
-                    setAnswers(data.answers);
-                    setResolution(data.resolution || null); 
-                } else {
-                    setError(data.message || 'Failed to fetch details.');
-                }
-            } catch (err) {
-                setError('Network error or server unavailable.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchDetails();
+                setSubmission(data.details);
+                setAnswers(data.answers);
+                setResolution(data.resolution);
+            })
+            .catch((err) => setError(getErrorMessage(err)))
+            .finally(() => setLoading(false));
     }, [submissionID]);
 
     const getStatusClass = (status) => {
@@ -79,8 +79,7 @@ const SubmissionDetail = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-siit-light font-sans">
-            
-            <AuthHeader /> 
+            <AuthHeader />
 
             <main className="flex-grow p-8">
                 <div className="max-w-4xl mx-auto">
@@ -91,7 +90,6 @@ const SubmissionDetail = () => {
                         &larr; Back to List
                     </button>
 
-                    {/* --- Header Card --- */}
                     <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
                         <div className="flex justify-between items-center mb-4">
                             <h1 className="text-3xl font-extrabold text-gray-900">
@@ -109,15 +107,12 @@ const SubmissionDetail = () => {
                         </div>
                     </div>
 
-                    {/* --- Submission Details (User's Answers) --- */}
                     <div className="bg-white p-6 rounded-xl shadow-lg">
                         <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
                             Submission Details
                         </h2>
                         <div className="space-y-6">
                             {answers.map((answer, index) => {
-                                
-                                // Parse the label to remove keywords
                                 let label = answer.QText;
                                 if (label.includes('DROPDOWN:')) {
                                     label = label.split('DROPDOWN:')[0].trim();
@@ -127,16 +122,19 @@ const SubmissionDetail = () => {
                                     label = label.split('FILE:')[0].trim();
                                 }
 
+                                const imageSrc = answer.AnsURL || (
+                                  isImageSource(answer.AnswerText) ? answer.AnswerText : null
+                                );
+
                                 return (
                                     <div key={index} className="bg-gray-50 p-4 rounded-md border">
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                                             {label} 
                                         </label>
                                         
-                                        {/* Logic to display answer or image */}
-                                        {answer.AnswerText && (answer.AnswerText.endsWith('.jpg') || answer.AnswerText.endsWith('.png') || answer.AnswerText.endsWith('.jpeg')) ? (
+                                        {imageSrc ? (
                                             <img 
-                                                src={`http://localhost/siit-complaint-system/backend/uploads/${answer.AnswerText}`} 
+                                                src={imageSrc}
                                                 alt="Submission attachment"
                                                 className="max-w-md rounded-lg border"
                                             />
@@ -149,7 +147,6 @@ const SubmissionDetail = () => {
                         </div>
                     </div>
 
-                    {/* --- Official Resolution Section --- */}
                     {(submission.Status === 'Resolved' || submission.Status === 'In Progress') && resolution && (
                         <div className="bg-white p-6 rounded-xl shadow-lg mt-8 border-t-4 border-green-500">
                             <h2 className="text-2xl font-bold text-green-700 mb-6 border-b pb-2">
@@ -166,11 +163,22 @@ const SubmissionDetail = () => {
                                 {resolution.AttachmentPath && (
                                     <div className="mt-4">
                                         <h4 className="font-semibold text-gray-700 mb-2">Attachment:</h4>
-                                        <img 
-                                            src={`http://localhost/siit-complaint-system/backend/${resolution.AttachmentPath}`} 
-                                            alt="Resolution attachment" 
-                                            className="max-w-md rounded-lg border"
-                                        />
+                                        {isImageSource(resolution.AttachmentPath) ? (
+                                          <img 
+                                              src={resolution.AttachmentPath}
+                                              alt="Resolution attachment" 
+                                              className="max-w-md rounded-lg border"
+                                          />
+                                        ) : (
+                                          <a
+                                            href={resolution.AttachmentPath}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-siit-purple hover:underline"
+                                          >
+                                            View attachment
+                                          </a>
+                                        )}
                                     </div>
                                 )}
                             </div>

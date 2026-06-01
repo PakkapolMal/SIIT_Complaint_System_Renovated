@@ -1,7 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts.js';
-import AuthHeader from './AuthHeader'; 
+import { useAuth } from '../contexts/AuthProvider';
+import AuthHeader from './AuthHeader';
+import {
+  fetchQuestionsByTopic,
+  fetchTopics,
+  getErrorMessage,
+  submitComplaint,
+} from '../lib/complaintsService';
 
 const ComplaintStart = () => {
     const [topics, setTopics] = useState([]);
@@ -14,27 +20,18 @@ const ComplaintStart = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     
-    const { userId, userRole } = useContext(AuthContext);
+    const { userId, userRole } = useAuth();
     const navigate = useNavigate();
 
-    // Fetch all topics on component load
     useEffect(() => {
         setLoading(true);
-        fetch('http://localhost/siit-complaint-system/backend/getTopics.php')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    setTopics(data.topics);
-                } else {
-                    setError('Failed to load topics.');
-                }
-            })
-            .catch(() => setError('Network error. Failed to load topics.'))
+        fetchTopics()
+            .then(setTopics)
+            .catch((err) => setError(getErrorMessage(err)))
             .finally(() => setLoading(false));
     }, []);
 
-    // Fetch questions when a topic is selected
-    const handleTopicSelect = (topicId) => {
+    const handleTopicSelect = async (topicId) => {
         if (!topicId) {
             setSelectedTopic('');
             setQuestions([]);
@@ -46,27 +43,24 @@ const ComplaintStart = () => {
         setLoading(true);
         setSelectedTopic(topicId);
         setError('');
-        fetch(`http://localhost/siit-complaint-system/backend/getQuestionsByTopic.php?topicId=${topicId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    setQuestions(data.questions);
-                    const initialAnswers = {};
-                    data.questions.forEach(q => {
-                        const isFile = q.QText.includes('FILE:');
-                        initialAnswers[q.QID] = { text: '', isFile: isFile };
-                    });
-                    setAnswers(initialAnswers);
-                    setFiles({});
-                } else {
-                    setError('Failed to load questions.');
-                }
-            })
-            .catch(() => setError('Network error. Failed to load questions.'))
-            .finally(() => setLoading(false));
+
+        try {
+            const nextQuestions = await fetchQuestionsByTopic(topicId);
+            setQuestions(nextQuestions);
+            const initialAnswers = {};
+            nextQuestions.forEach((q) => {
+                const isFile = q.QText.includes('FILE:');
+                initialAnswers[q.QID] = { text: '', isFile };
+            });
+            setAnswers(initialAnswers);
+            setFiles({});
+        } catch (err) {
+            setError(getErrorMessage(err));
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Handlers for form inputs
     const handleAnswerChange = (qid, value) => {
         setAnswers(prev => ({
             ...prev,
@@ -86,7 +80,6 @@ const ComplaintStart = () => {
         }));
     };
 
-    //Handler for Checkboxes
     const handleCheckboxChange = (qid, option, isChecked) => {
         const currentAnswer = answers[qid]?.text || '';
         let currentOptions = currentAnswer ? currentAnswer.split(', ') : [];
@@ -102,8 +95,6 @@ const ComplaintStart = () => {
         handleAnswerChange(qid, currentOptions.join(', '));
     };
 
-
-    // Handle final form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -115,45 +106,25 @@ const ComplaintStart = () => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append('TopicID', selectedTopic);
-        formData.append('userId', userId);
-        formData.append('userRole', userRole); 
-        
-        // Package answers
         const simplifiedAnswers = Object.keys(answers).map(qid => ({
-            qid: qid,
+            qid,
             text: answers[qid].text,
             isFile: answers[qid].isFile
         }));
-        formData.append('answers', JSON.stringify(simplifiedAnswers));
-
-        // Package files
-        Object.keys(files).forEach(qid => {
-            if (files[qid]) {
-                formData.append(`file-${qid}`, files[qid]);
-            }
-        });
 
         try {
-            const response = await fetch('http://localhost/siit-complaint-system/backend/submitComplaint.php', {
-                method: 'POST',
-                body: formData,
+            const submissionId = await submitComplaint({
+                topicId: selectedTopic,
+                answers: simplifiedAnswers,
+                files,
             });
-            const data = await response.json();
 
-            if (data.success) {
-                navigate('/thankyou', { 
-                    replace: true, 
-                    state: { 
-                        submissionId: data.submissionId 
-                    } 
-                });
-            } else {
-                setError(`Submission failed. Message: ${data.message}`);
-            }
+            navigate('/thankyou', {
+                replace: true,
+                state: { submissionId },
+            });
         } catch (err) {
-            setError('Network error. Failed to submit complaint.');
+            setError(getErrorMessage(err));
         } finally {
             setLoading(false);
         }
@@ -161,7 +132,7 @@ const ComplaintStart = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-siit-light font-sans">
-            <AuthHeader /> {/* <-- 2. ADDED IT HERE */}
+            <AuthHeader />
 
             <main className="flex-grow p-8">
                 <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-2xl">
@@ -173,7 +144,6 @@ const ComplaintStart = () => {
                     </h1>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Topic Selection */}
                         <div className="mb-6">
                             <label htmlFor="topic" className="block text-lg font-semibold text-gray-800 mb-2">
                                 1. Select a Topic <span className="text-red-500">*</span>
@@ -194,7 +164,6 @@ const ComplaintStart = () => {
                             </select>
                         </div>
 
-                        {/* Dynamic Questions */}
                         {loading && <p>Loading questions...</p>}
                         
                         {questions.length > 0 && (
@@ -287,7 +256,6 @@ const ComplaintStart = () => {
                             </div>
                         )}
 
-                        {/* Submit Button */}
                         <div className="text-center pt-4">
                             <button
                                 type="submit"

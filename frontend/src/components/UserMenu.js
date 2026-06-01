@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../contexts.js'; 
+import { useAuth } from '../contexts/AuthProvider';
 import AuthHeader from './AuthHeader';
 
 const UserMenu = () => {
     // --- Get 'userName' from the context ---
-    const { userName } = useContext(AuthContext);
+    const { userName } = useAuth();
 
     return (
         <div className="flex flex-col min-h-screen bg-siit-light">

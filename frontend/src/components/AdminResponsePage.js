@@ -1,44 +1,36 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts.js'; 
+import { useAuth } from '../contexts/AuthProvider';
 import SubmissionDetail from './SubmissionDetail';
+import {
+  fetchSubmissionDetails,
+  getErrorMessage,
+  submitResolution,
+} from '../lib/complaintsService';
 
 const AdminResponsePage = () => {
     const { submissionID } = useParams();
     const navigate = useNavigate();
     
-    // Add new state for the form ---
-    const { userId } = useContext(AuthContext); // Get the Admin's ID
+    const { userId } = useAuth();
     const [resText, setResText] = useState('');
     const [attachment, setAttachment] = useState(null);
-    const [status, setStatus] = useState('In Progress'); // Default to "In Progress"
+    const [status, setStatus] = useState('In Progress');
     
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    // Fetch current submission details to pre-fill status ---
     useEffect(() => {
-        const fetchSubmissionStatus = async () => {
-            try {
-                // We re-use the detail script to get the current status
-                const response = await fetch(`http://localhost/siit-complaint-system/backend/getSubmissionDetails.php?id=${submissionID}`);
-                const data = await response.json();
-                if (data.success) {
-                    // Set the status dropdown to the submission's current status
-                    setStatus(data.details.Status); 
-                } else {
-                    setError('Failed to fetch submission details.');
+        fetchSubmissionDetails(submissionID)
+            .then((data) => {
+                if (data?.details?.Status) {
+                    setStatus(data.details.Status);
                 }
-            } catch (err) {
-                setError('Network error.');
-            }
-        };
-        fetchSubmissionStatus();
+            })
+            .catch((err) => setError(getErrorMessage(err)));
     }, [submissionID]);
 
-
-    // Update the submit handler ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -51,30 +43,25 @@ const AdminResponsePage = () => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append('submissionId', submissionID);
-        formData.append('adminId', userId); 
-        formData.append('resText', resText);
-        formData.append('status', status); 
-        if (attachment) {
-            formData.append('attachment', attachment);
+        if (!userId) {
+            setError('Staff ID is missing from your session.');
+            setLoading(false);
+            return;
         }
 
         try {
-            const response = await fetch('http://localhost/siit-complaint-system/backend/submitResolution.php', {
-                method: 'POST',
-                body: formData,
+            await submitResolution({
+                submissionId: submissionID,
+                staffId: userId,
+                resText,
+                status,
+                attachment,
             });
-            const data = await response.json();
 
-            if (data.success) {
-                setSuccess(data.message);
-                setTimeout(() => navigate('/admin/complaints'), 2000);
-            } else {
-                setError(data.message || 'Submission failed.');
-            }
+            setSuccess('Response submitted and status updated successfully.');
+            setTimeout(() => navigate('/admin/complaints'), 2000);
         } catch (err) {
-            setError('Network error. Please try again.');
+            setError(getErrorMessage(err));
         } finally {
             setLoading(false);
         }
@@ -82,19 +69,15 @@ const AdminResponsePage = () => {
     
     return (
         <div className="flex flex-col min-h-screen bg-siit-light font-sans">
-            {/* The re-use SubmissionDetail component to show the complaint --- */}
             <SubmissionDetail /> 
             
-            {/* Add the Response Form --- */}
-            <main className="flex-grow p-8 -mt-6"> {/* Use negative margin to pull up */}
+            <main className="flex-grow p-8 -mt-6">
                 <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-2xl border-t-4 border-siit-purple">
                     <h1 className="text-3xl font-extrabold text-gray-900 mb-6">
                         Administrator Response
                     </h1>
                     
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        
-                        {/* --- NEW STATUS DROPDOWN --- */}
                         <div>
                             <label htmlFor="status" className="block text-sm font-medium text-gray-700">
                                 Set Status
@@ -111,7 +94,6 @@ const AdminResponsePage = () => {
                             </select>
                         </div>
 
-                        {/* Response Text */}
                         <div>
                             <label htmlFor="resText" className="block text-sm font-medium text-gray-700">
                                 Official Response
@@ -127,7 +109,6 @@ const AdminResponsePage = () => {
                             />
                         </div>
 
-                        {/* File Attachment */}
                         <div>
                             <label htmlFor="attachment" className="block text-sm font-medium text-gray-700">
                                 Attach File (Optional)
@@ -145,7 +126,6 @@ const AdminResponsePage = () => {
                             />
                         </div>
 
-                        {/* Messages */}
                         {error && (
                             <div className="p-3 text-sm font-medium text-red-700 bg-red-100 rounded-lg border border-red-300">
                                 {error}
@@ -157,7 +137,6 @@ const AdminResponsePage = () => {
                             </div>
                         )}
 
-                        {/* Submit Button */}
                         <div className="text-right">
                             <button
                                 type="submit"

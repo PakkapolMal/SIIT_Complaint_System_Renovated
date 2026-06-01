@@ -1,123 +1,62 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PublicHeader from '../components/PublicHeader'; // <-- 1. IMPORTED
+import PublicHeader from './PublicHeader';
+import { useAuth } from '../contexts/AuthProvider';
 
-const LoginPage = ({ setIsAuthenticated, setUserRole, setUserId, setUserName }) => {
-    const navigate = useNavigate(); 
-    const [idInput, setIdInput] = useState('');
-    const [password, setPassword] = useState(''); 
-    const [error, setError] = useState(''); 
-    const [loading, setLoading] = useState(false); 
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const { signInWithGoogle, isLoading, authError, isAuthenticated, isAdmin, profileComplete } = useAuth();
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
 
-        const formData = new FormData();
-        formData.append('userId', idInput);
-        formData.append('password', password);
+    if (isAdmin) {
+      navigate('/admin', { replace: true });
+      return;
+    }
 
-        try {
-            const response = await fetch('http://localhost/siit-complaint-system/backend/authenticate.php', {
-                method: 'POST',
-                body: formData,
-            });
-            const data = await response.json();
+    navigate(profileComplete ? '/portal' : '/signup', { replace: true });
+  }, [isAuthenticated, isAdmin, profileComplete, navigate]);
 
-            if (data.success) {
-                const role = data.role;
-                
-                // Set the global authentication state
-                setIsAuthenticated(true);
-                setUserRole(role);
-                setUserId(data.userId); 
-                setUserName(data.name); 
-                
-                // Send BOTH 'Admin' and 'Staff' to the /admin route
-                if (role === 'Admin' || role === 'Staff') {
-                    navigate('/admin');
-                } else {
-                    navigate('/portal'); 
-                }
+  return (
+    <div className="flex flex-col min-h-screen bg-siit-light">
+      <PublicHeader page="login" />
 
-            } else {
-                setError(data.message);
-            }
-        } catch (err) {
-            setError('Network error or server unavailable.');
-        } finally {
-            setLoading(false);
-        }
-    };
+      <main className="flex justify-center items-center flex-grow p-4 sm:p-8">
+        <div className="w-full max-w-3xl bg-white p-8 rounded-xl shadow-2xl">
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">
+            Sign In
+          </h1>
+          <p className="text-sm text-gray-600 text-center mb-8">
+            Use your SIIT Google account (@siit.tu.ac.th or @g.siit.tu.ac.th).
+          </p>
 
+          {authError && (
+            <div className="mb-6 p-3 text-sm font-medium text-red-700 bg-red-100 rounded-lg border border-red-300">
+              {authError}
+            </div>
+          )}
 
-    return (
-        <div className="flex flex-col min-h-screen bg-siit-light">
-            
-            <PublicHeader page="login" /> {/* <-- 2. USING THE HEADER */}
-
-            <main className="flex justify-center items-center flex-grow p-4 sm:p-8">
-                
-                {/* --- 3. FIXED WIDTH --- */}
-                <div className="w-full max-w-3xl bg-white p-8 rounded-xl shadow-2xl">
-                    
-                    <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
-                        Login
-                    </h1>
-                    
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div>
-                            <label htmlFor="userId" className="block text-sm font-medium text-gray-700">
-                                Student/Staff/Admin ID
-                            </label>
-                            <input
-                                id="userId"
-                                name="userId"
-                                type="text"
-                                required
-                                value={idInput}
-                                onChange={(e) => setIdInput(e.target.value)}
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 transition duration-150"
-                                placeholder="e.g., 6622781027 or 1003"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 transition duration-150"
-                                placeholder="••••••••"
-                            />
-                        </div>
-                        
-                        {error && (
-                            <div className="p-3 text-sm font-medium text-red-700 bg-red-100 rounded-lg border border-red-300">
-                                {error}
-                            </div>
-                        )}
-
-                        <div>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-md text-lg font-medium text-white bg-siit-purple hover:bg-purple-700 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading ? 'Logging in...' : 'Sign In'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </main>
+          <button
+            type="button"
+            onClick={signInWithGoogle}
+            disabled={isLoading}
+            className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-gray-300 rounded-lg shadow-md text-lg font-medium text-gray-800 bg-white hover:bg-gray-50 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+            </svg>
+            {isLoading ? 'Redirecting to Google...' : 'Continue with Google'}
+          </button>
         </div>
-    );
+      </main>
+    </div>
+  );
 };
 
 export default LoginPage;

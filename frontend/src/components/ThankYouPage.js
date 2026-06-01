@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link, useLocation, Navigate } from 'react-router-dom';
-import { AuthContext } from '../contexts.js'; 
+import { useAuth } from '../contexts/AuthProvider';
 import AuthHeader from './AuthHeader'; 
 
 const ThankYouPage = () => {
@@ -8,7 +8,7 @@ const ThankYouPage = () => {
     // Get submissionId from the state passed by ComplaintStart
     const submissionId = location.state?.submissionId;
 
-    const { isAdmin } = useContext(AuthContext);
+    const { isAdmin } = useAuth();
 
     // If no submissionId is found (e.g., page refresh), redirect to the correct dashboard.
     if (!submissionId) {

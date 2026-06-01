@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts.js'; 
-import AuthHeader from './AuthHeader'; // <-- 1. IMPORT IT
-import PublicHeader from '../components/PublicHeader'; // <-- 2. IMPORT
+import { useAuth } from '../contexts/AuthProvider';
+import AuthHeader from './AuthHeader';
+import { fetchPublicSubmissions, getErrorMessage } from '../lib/complaintsService';
+import PublicHeader from './PublicHeader';
 
 const OverallResponseView = () => {
     const [submissions, setSubmissions] = useState([]);
@@ -10,27 +11,13 @@ const OverallResponseView = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch('http://localhost:80/siit-complaint-system/backend/getAllSubmissions.php');
-                const data = await response.json();
-
-                if (data.success) {
-                    setSubmissions(data.submissions);
-                } else {
-                    setError(data.message || 'Failed to fetch submissions.');
-                }
-            } catch (err) {
-                setError('Network error or server unavailable.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
+        fetchPublicSubmissions()
+            .then(setSubmissions)
+            .catch((err) => setError(getErrorMessage(err)))
+            .finally(() => setLoading(false));
     }, []);
 
     const getStatusClass = (status) => {
@@ -52,7 +39,6 @@ const OverallResponseView = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-siit-light font-sans">
-            
             {isAuthenticated ? <AuthHeader /> : <PublicHeader />}
 
             <main className="flex-grow p-8">
@@ -96,17 +82,15 @@ const OverallResponseView = () => {
                                         <th className="px-4 py-3">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-Ggray-200">
+                                <tbody className="bg-white divide-y divide-gray-200">
                                     {submissions.map(submission => (
                                         <tr key={submission.SubmissionID} className="hover:bg-purple-50 transition duration-150">
                                             <td className="px-4 py-3 text-sm text-gray-800">{submission.SubmissionID}</td>
                                             <td className="px-4 py-3 text-sm text-gray-800">{submission.Date}</td>
                                             <td className="px-4 py-3 font-medium text-gray-900">{submission.TopicName}</td>
-                                            
                                             <td className="px-4 py-3 text-sm text-gray-800">
                                                 {submission.SubmitterInfo} 
                                             </td>
-                                            
                                             <td className="px-4 py-3">
                                                 <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${getStatusClass(submission.Status)}`}>
                                                     {submission.Status}

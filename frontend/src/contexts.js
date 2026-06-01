@@ -1,14 +1,8 @@
 import { createContext } from 'react';
 
-export const AuthContext = createContext({
-    isAuthenticated: false,
-    userId: null, 
-    userRole: null,
-    isLoading: false,
-    isAdmin: false,
-    isStudent: false,
-    roleLabel: 'Guest',
-    handleLogout: () => {},
-});
+/** @deprecated Import useAuth from contexts/AuthProvider.js instead */
+export const AuthContext = createContext(null);
 
 export const NavigationContext = createContext(null);
+
+export { AuthProvider, useAuth } from './contexts/AuthProvider';

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts.js'; 
-import AuthHeader from './AuthHeader'; 
+import { useAuth } from '../contexts/AuthProvider';
+import AuthHeader from './AuthHeader';
+import { fetchUserHistory, getErrorMessage } from '../lib/complaintsService';
 
 const UserHistory = () => {
     const [submissions, setSubmissions] = useState([]);
@@ -9,10 +10,8 @@ const UserHistory = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     
-    // Get the logged-in user's ID and details from context
-    const { userId } = useContext(AuthContext);
+    const { userId } = useAuth();
 
-    // Helper function to determine badge color based on status
     const getStatusClass = (status) => {
         switch (status) {
             case 'Pending':
@@ -27,41 +26,21 @@ const UserHistory = () => {
     };
 
     useEffect(() => {
-        // Only fetch if the userId is available
-        if (userId) {
-            const fetchSubmissions = async () => {
-                try {
-                    // Call the new script with the user's ID
-                    const response = await fetch(`http://localhost/siit-complaint-system/backend/getUserHistory.php?userId=${userId}`);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    if (data.success) {
-                        setSubmissions(data.submissions);
-                        setError(null);
-                    } else {
-                        setError(data.message || 'API returned an error.');
-                    }
-                } catch (e) {
-                    setError('Failed to connect to server or fetch data.');
-                    console.error('Fetch Error:', e);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchSubmissions();
-        } else {
-            // No userId, likely still loading context or user is not auth
+        if (!userId) {
             setLoading(false);
-            setError("You must be logged in to view your history.");
+            setError('You must be logged in to view your history.');
+            return;
         }
-    }, [userId]); // Re-run if userId changes
+
+        fetchUserHistory(userId)
+            .then(setSubmissions)
+            .catch((err) => setError(getErrorMessage(err)))
+            .finally(() => setLoading(false));
+    }, [userId]);
 
     return (
         <div className="min-h-screen bg-siit-light font-sans">
-            
-            <AuthHeader /> 
+            <AuthHeader />
 
             <main className="flex-grow p-8">
                 <div className="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-2xl">
@@ -73,13 +52,12 @@ const UserHistory = () => {
                     </p>
                     
                     <button 
-                        onClick={() => navigate(-1)} // Goes back to User Menu
+                        onClick={() => navigate(-1)}
                         className="text-siit-purple hover:underline mb-4 block"
                     >
                         &larr; Back to Previous Page
                     </button>
 
-                    {/* --- Loading, Error, and Empty States --- */}
                     {loading ? (
                         <div className="text-center p-8">
                             <p className="text-lg text-gray-600">Loading your submissions...</p>
@@ -93,7 +71,6 @@ const UserHistory = () => {
                             You have not submitted any complaints yet.
                         </div>
                     ) : (
-                        // --- Submissions Table ---
                         <div className="overflow-x-auto shadow-md rounded-lg">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead>

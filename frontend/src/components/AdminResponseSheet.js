@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthHeader from './AuthHeader'; 
+import AuthHeader from './AuthHeader';
+import {
+  deleteSubmission,
+  fetchAdminSubmissions,
+  getErrorMessage,
+} from '../lib/complaintsService';
 
 const AdminResponseSheet = () => {
     const [submissions, setSubmissions] = useState([]);
@@ -8,7 +13,6 @@ const AdminResponseSheet = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Helper function to determine badge color based on status
     const getStatusClass = (status) => {
         switch (status) {
             case 'Pending':
@@ -22,67 +26,40 @@ const AdminResponseSheet = () => {
         }
     };
 
+    const loadSubmissions = () => {
+        setLoading(true);
+        fetchAdminSubmissions()
+            .then((rows) => {
+                setSubmissions(rows);
+                setError(null);
+            })
+            .catch((err) => setError(getErrorMessage(err)))
+            .finally(() => setLoading(false));
+    };
+
     useEffect(() => {
-        const fetchSubmissions = async () => {
-            try {
-                const response = await fetch('http://localhost/siit-complaint-system/backend/getAdminSubmissions.php');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                if (data.success) {
-                    setSubmissions(data.submissions);
-                    setError(null);
-                } else {
-                    setError(data.message || 'API returned an error.');
-                }
-            } catch (e) {
-                setError('Failed to connect to server or fetch data.');
-                console.error('Fetch Error:', e);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchSubmissions();
+        loadSubmissions();
     }, []);
 
-    // Function to handle deletion
     const handleDelete = async (submissionId) => {
         if (!window.confirm(`Are you sure you want to delete submission #${submissionId}? This action cannot be undone.`)) {
             return;
         }
 
         try {
-            const formData = new FormData();
-            formData.append('submissionId', submissionId);
-
-            const response = await fetch('http://localhost/siit-complaint-system/backend/deleteSubmission.php', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                alert('Submission deleted successfully.');
-                setSubmissions(prevSubmissions => 
-                    prevSubmissions.filter(s => s.SubmissionID !== submissionId)
-                );
-            } else {
-                alert(`Error: ${data.message}`);
-            }
+            await deleteSubmission(submissionId);
+            setSubmissions((prevSubmissions) =>
+                prevSubmissions.filter((s) => s.SubmissionID !== submissionId)
+            );
         } catch (err) {
-            alert('A network error occurred. Failed to delete submission.');
+            alert(getErrorMessage(err));
         }
     };
 
     return (
         <div className="min-h-screen bg-siit-light font-sans">
-            
-            {/* --- Header --- */}
-            <AuthHeader /> 
+            <AuthHeader />
 
-            {/* --- Main Content --- */}
             <main className="flex-grow p-8">
                 <div className="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-2xl">
                     <h1 className="text-4xl font-extrabold text-siit-purple mb-4 border-b pb-2">
@@ -99,7 +76,6 @@ const AdminResponseSheet = () => {
                         &larr; Back to Admin Dashboard
                     </button>
 
-                    {/* Loading, Error, and Empty States */}
                     {loading ? (
                         <div className="text-center p-8">
                             <p className="text-lg text-gray-600">Loading submissions...</p>
@@ -113,7 +89,6 @@ const AdminResponseSheet = () => {
                             No complaints have been submitted yet.
                         </div>
                     ) : (
-                        // --- Submissions Table ---
                         <div className="overflow-x-auto shadow-md rounded-lg">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead>
@@ -132,12 +107,10 @@ const AdminResponseSheet = () => {
                                             <td className="px-4 py-3 text-sm text-gray-800 font-medium">#{submission.SubmissionID}</td>
                                             <td className="px-4 py-3 text-sm text-gray-800">{submission.Date}</td>
                                             <td className="px-4 py-3 font-medium text-gray-900">{submission.TopicName}</td>
-                                            
                                             <td className="px-4 py-3 text-sm text-gray-800">
                                                 {submission.SubmitterName}
                                                 <span className="text-xs text-gray-500 ml-2">({submission.SubmitterRole})</span>
                                             </td>
-                                            
                                             <td className="px-4 py-3">
                                                 <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${getStatusClass(submission.Status)}`}>
                                                     {submission.Status}
