@@ -62,7 +62,6 @@ SET default_table_access_method = "heap";
 CREATE TABLE IF NOT EXISTS "public"."admin" (
     "UUID" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "Role" "text" DEFAULT 'Student'::"text" NOT NULL,
-    "Password" "text" NOT NULL,
     "StaffID" "text",
     "StudentID" "text"
 );
@@ -121,7 +120,7 @@ CREATE TABLE IF NOT EXISTS "public"."staff" (
     "StaffID" "text" NOT NULL,
     "Division" "text",
     "StaffName" "text",
-    "Password" "text"
+    "Email" "text"
 );
 
 
@@ -134,7 +133,7 @@ CREATE TABLE IF NOT EXISTS "public"."student" (
     "StudentName" "text",
     "Year" integer DEFAULT 1,
     "Department" "text" DEFAULT ''::"text",
-    "Password" "text" NOT NULL
+    "Email" "text"
 );
 
 
@@ -278,6 +277,11 @@ ALTER TABLE ONLY "public"."admin"
 
 
 
+ALTER TABLE ONLY "public"."admin"
+    ADD CONSTRAINT "admin_UUID_fkey" FOREIGN KEY ("UUID") REFERENCES "auth"."users"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."question"
     ADD CONSTRAINT "question_TopicID_fkey" FOREIGN KEY ("TopicID") REFERENCES "public"."topic"("TopicID") ON UPDATE CASCADE ON DELETE RESTRICT;
 
@@ -290,6 +294,16 @@ ALTER TABLE ONLY "public"."resolution"
 
 ALTER TABLE ONLY "public"."resolution"
     ADD CONSTRAINT "resolution_SubmissionID_fkey" FOREIGN KEY ("SubmissionID") REFERENCES "public"."submission"("SubmissionID") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."staff"
+    ADD CONSTRAINT "staff_UUID_fkey" FOREIGN KEY ("UUID") REFERENCES "auth"."users"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."student"
+    ADD CONSTRAINT "student_UUID_fkey" FOREIGN KEY ("UUID") REFERENCES "auth"."users"("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 
