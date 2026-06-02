@@ -16,19 +16,20 @@ function formatDate(value) {
 }
 
 function mapSubmitterInfo(submission) {
-  if (submission.student) {
-    const year = submission.student.Year;
-    const department = submission.student.Department;
+  if (submission.StudentID) {
+    const year = submission.student?.Year;
+    const department = submission.student?.Department;
     if (year != null && department) {
       return `${year} - ${department}`;
     }
+    return 'Student';
   }
 
-  if (submission.StaffID || submission.staff) {
+  if (submission.StaffID) {
     return 'Staff';
   }
 
-  return 'Staff';
+  return 'Unknown';
 }
 
 export async function fetchTopics() {
