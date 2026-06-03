@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthProvider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { cn } from '../lib/utils';
-import { layout, typography } from '../lib/designTokens';
+import { layout } from '../lib/designTokens';
 
 function GoogleIcon() {
   return (

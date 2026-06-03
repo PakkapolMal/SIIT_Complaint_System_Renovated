@@ -1,6 +1,6 @@
-import React, { useEffect, useId, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
 import { useAuth } from '../contexts/AuthProvider';
 import AuthenticatedLayout from './layout/AuthenticatedLayout';
 import ComplaintsList from './dashboard/ComplaintsList';

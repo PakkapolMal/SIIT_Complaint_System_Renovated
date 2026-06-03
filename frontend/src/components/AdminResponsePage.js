@@ -16,6 +16,7 @@ const AdminResponsePage = () => {
   const [resText, setResText] = useState('');
   const [attachment, setAttachment] = useState(null);
   const [status, setStatus] = useState('In Progress');
+  const [initialStatus, setInitialStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -25,6 +26,7 @@ const AdminResponsePage = () => {
       .then((data) => {
         if (data?.details?.Status) {
           setStatus(data.details.Status);
+          setInitialStatus(data.details.Status);
         }
       })
       .catch((err) => setError(getErrorMessage(err)));
@@ -59,6 +61,7 @@ const AdminResponsePage = () => {
         resText,
         status,
         attachment,
+        oldStatus: initialStatus,
       });
 
       setSuccess('Response submitted and status updated successfully.');
