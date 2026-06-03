@@ -64,14 +64,14 @@ function LandingStats() {
       />
       <div className={layout.grid3Cols}>
         {statCards.map(({ key, label, value, icon: Icon, isStatic }) => (
-          <Card key={key} className="shadow-sm">
+          <Card key={key} className="flex h-full flex-col shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {label}
               </CardTitle>
               <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
             </CardHeader>
-            <CardContent>
+            <CardContent className="mt-auto">
               {loading && !isStatic ? (
                 <Skeleton className="h-8 w-20" aria-label="Loading statistic" />
               ) : (

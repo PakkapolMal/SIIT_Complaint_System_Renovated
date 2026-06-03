@@ -57,14 +57,10 @@ export const landingCopy = {
     title: 'Platform activity',
     subtitle: 'Live counts from publicly visible submissions',
     labels: {
-      total: 'Total submissions tracked',
+      total: 'Total submissions',
       resolved: 'Resolved cases',
       inProgress: 'In progress',
-      response: 'Typical response window',
     },
-    responseValue: 'Within 5 business days',
-    activeUsersLabel: 'Community',
-    activeUsersValue: 'Students & staff',
   },
   mobile: {
     title: 'Built for web—and ready for mobile',

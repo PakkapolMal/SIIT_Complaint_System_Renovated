@@ -8,7 +8,7 @@ export const layout = {
   touchTarget: 'min-h-11 min-w-[2.75rem]',
   cardGap: 'gap-4 sm:gap-6',
   gridFeatures: 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6',
-  grid3Cols: 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6',
+  grid3Cols: 'mx-auto grid max-w-4xl grid-cols-3 gap-3',
 };
 
 export const typography = {
