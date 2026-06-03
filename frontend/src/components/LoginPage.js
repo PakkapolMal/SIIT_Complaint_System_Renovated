@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PublicHeader from './PublicHeader';
+import AppLayout from './layout/AppLayout';
+import PublicNav from './layout/PublicNav';
 import { useAuth } from '../contexts/AuthProvider';
+import { Card, CardContent } from './ui/card';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -21,20 +23,25 @@ const LoginPage = () => {
   }, [isAuthenticated, isAdmin, profileComplete, navigate]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-siit-light">
-      <PublicHeader page="login" />
-
-      <main className="flex justify-center items-center flex-grow p-4 sm:p-8">
-        <div className="w-full max-w-3xl bg-white p-8 rounded-xl shadow-2xl">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">
+    <AppLayout
+      headerRight={<PublicNav page="login" />}
+      homeTo="/"
+      mainClassName="flex items-center justify-center p-4 sm:p-8"
+    >
+      <Card className="w-full max-w-3xl shadow-md">
+        <CardContent className="p-8">
+          <h1 className="mb-2 text-center text-3xl font-bold text-foreground">
             Sign In
           </h1>
-          <p className="text-sm text-gray-600 text-center mb-8">
+          <p className="mb-8 text-center text-sm text-muted-foreground">
             Use your SIIT Google account (@siit.tu.ac.th or @g.siit.tu.ac.th).
           </p>
 
           {authError && (
-            <div className="mb-6 p-3 text-sm font-medium text-red-700 bg-red-100 rounded-lg border border-red-300">
+            <div
+              className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm font-medium text-destructive"
+              role="alert"
+            >
               {authError}
             </div>
           )}
@@ -43,9 +50,9 @@ const LoginPage = () => {
             type="button"
             onClick={signInWithGoogle}
             disabled={isLoading}
-            className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-gray-300 rounded-lg shadow-md text-lg font-medium text-gray-800 bg-white hover:bg-gray-50 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg border border-input bg-card px-4 py-3 text-lg font-medium text-foreground shadow-sm transition-colors duration-200 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <svg className="w-5 h-5" viewBox="0 0 48 48" aria-hidden="true">
+            <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
               <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
               <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
@@ -53,9 +60,9 @@ const LoginPage = () => {
             </svg>
             {isLoading ? 'Redirecting to Google...' : 'Continue with Google'}
           </button>
-        </div>
-      </main>
-    </div>
+        </CardContent>
+      </Card>
+    </AppLayout>
   );
 };
 

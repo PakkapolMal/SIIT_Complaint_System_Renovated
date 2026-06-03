@@ -1,70 +1,61 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import AuthHeader from './AuthHeader'; 
+import AuthenticatedLayout from './layout/AuthenticatedLayout';
+import { Card, CardContent } from './ui/card';
 
 const AdminMenu = () => {
+  return (
+    <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+      <Card className="mx-auto max-w-3xl shadow-md">
+        <CardContent className="p-6 sm:p-8">
+          <h2 className="mb-2 text-3xl font-bold text-foreground">
+            Administrator Tools
+          </h2>
+          <p className="mb-8 text-muted-foreground">
+            Manage submitted complaints, set resolutions, and update statuses.
+          </p>
 
-    return (
-        <div className="flex flex-col min-h-screen bg-siit-light">
-            {/* --- Header --- */}
-            <AuthHeader /> 
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+            <Link
+              to="/admin/complaints"
+              className="block cursor-pointer rounded-lg border border-border bg-muted/40 p-6 shadow-sm transition-colors duration-200 hover:bg-accent hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <h3 className="mb-2 text-xl font-semibold text-foreground">
+                Manage Complaints
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                View the admin list and update complaint statuses and resolutions.
+              </p>
+            </Link>
 
-            {/* --- Main Content --- */}
-            <main className="flex-grow p-4 sm:p-8">
-                <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-2xl">
-                    <h2 className="text-3xl font-extrabold text-siit-purple mb-6">
-                        Administrator Tools
-                    </h2>
+            <Link
+              to="/overall-view"
+              className="block cursor-pointer rounded-lg border border-border bg-muted/40 p-6 shadow-sm transition-colors duration-200 hover:bg-accent hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <h3 className="mb-2 text-xl font-semibold text-foreground">
+                View Public Statuses
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Check the general, anonymous view of all submissions.
+              </p>
+            </Link>
 
-                    <p className="text-gray-600 mb-8">
-                        Manage all submitted complaints, set resolutions, and update statuses.
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        {/* Manage Complaints (Half Width) */}
-                        <Link 
-                            to="/admin/complaints" 
-                            className="block p-6 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-shadow duration-200 shadow-md hover:shadow-lg"
-                        >
-                            <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                                Manage Complaints
-                            </h3>
-                            <p className="text-gray-600 text-sm">
-                                View the admin list and update complaint statuses/resolutions.
-                            </p>
-                        </Link>
-
-                        {/* View Public Statuses (Half Width) */}
-                        <Link 
-                            to="/overall-view" 
-                            className="block p-6 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-shadow duration-200 shadow-md hover:shadow-lg"
-                        >
-                            <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                                View Public Statuses
-                            </h3>
-                            <p className="text-gray-600 text-sm">
-                                Check the general, anonymous view of all submissions.
-                            </p>
-                        </Link>
-                        
-                        {/* File New Complaint (FULL WIDTH, same as UserMenu) */}
-                        <Link 
-                            to="/topics" 
-                            className="block p-6 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-shadow duration-200 shadow-md hover:shadow-lg col-span-1 md:col-span-2"
-                        >
-                            <h3 className="text-xl font-semibold text-siit-purple mb-2">
-                                File New Complaint
-                            </h3>
-                            <p className="text-gray-600 text-sm">
-                                Submit a new complaint or suggestion to the system.
-                            </p>
-                        </Link>
-                    </div>
-                </div>
-            </main>
-        </div>
-    );
+            <Link
+              to="/topics"
+              className="block cursor-pointer rounded-lg border border-primary/20 bg-primary/5 p-6 shadow-sm transition-colors duration-200 hover:bg-primary/10 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:col-span-2"
+            >
+              <h3 className="mb-2 text-xl font-semibold text-primary">
+                File New Complaint
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Submit a new complaint or suggestion to the system.
+              </p>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </AuthenticatedLayout>
+  );
 };
 
 export default AdminMenu;

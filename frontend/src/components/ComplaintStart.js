@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthProvider';
-import AuthHeader from './AuthHeader';
+import AuthenticatedLayout from './layout/AuthenticatedLayout';
 import {
   fetchQuestionsByTopic,
   fetchTopics,
@@ -131,11 +131,8 @@ const ComplaintStart = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-siit-light font-sans">
-            <AuthHeader />
-
-            <main className="flex-grow p-8">
-                <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-2xl">
+        <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+                <div className="mx-auto max-w-4xl rounded-xl border border-border bg-card p-6 shadow-md sm:p-8">
                     <button onClick={() => navigate(-1)} className="text-siit-purple hover:underline mb-4">
                         &larr; Back to Menu
                     </button>
@@ -267,8 +264,7 @@ const ComplaintStart = () => {
                         </div>
                     </form>
                 </div>
-            </main>
-        </div>
+        </AuthenticatedLayout>
     );
 };
 
