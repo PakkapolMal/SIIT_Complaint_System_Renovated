@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Activity, CheckCircle2, Clock, Users } from 'lucide-react';
+import { Activity, CheckCircle2, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
 import SectionHeader from './SectionHeader';
 import LandingSection from './LandingSection';
 import { landingCopy } from './landingContent';
 import { fetchPublicSubmissions } from '../../lib/complaintsService';
-import { cn } from '../../lib/utils';
-import { layout, typography } from '../../lib/designTokens';
+import { layout } from '../../lib/designTokens';
 
 function computeStats(submissions) {
   const resolved = submissions.filter((s) => s.Status === 'Resolved').length;
@@ -53,13 +52,6 @@ function LandingStats() {
       value: metrics?.inProgress,
       icon: Clock,
     },
-    /* {
-      key: 'community',
-      label: copy.activeUsersLabel,
-      value: copy.activeUsersValue,
-      icon: Users,
-      isStatic: true,
-    }, */
   ];
 
   return (

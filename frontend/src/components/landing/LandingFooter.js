@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { landingCopy } from './landingContent';
 import { cn } from '../../lib/utils';
 import { layout, typography } from '../../lib/designTokens';
@@ -46,20 +45,6 @@ function LandingFooter() {
               <InstagramIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
               <span><a href="https://www.instagram.com/siit.studentcommittee?igsh=OXZiMDduMTZ0dnRt" target="_blank" rel="noopener noreferrer" className="text-primary transition-colors duration-200 hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm w-fit">{footer.contact}</a></span>
             </p>
-            {/* <nav className="mt-4 flex flex-col gap-2 text-sm" aria-label="Footer links">
-              <Link
-                to="/login"
-                className="text-primary transition-colors duration-200 hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm w-fit"
-              >
-                Sign in
-              </Link>
-              <Link
-                to="/overall-view"
-                className="text-primary transition-colors duration-200 hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm w-fit"
-              >
-                Public complaints
-              </Link>
-            </nav> */}
           </div>
         </div>
         <div className="border-t border-border py-6">
