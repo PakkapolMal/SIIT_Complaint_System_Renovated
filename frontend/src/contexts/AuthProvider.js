@@ -293,7 +293,7 @@ export function AuthProvider({ children }) {
 
   if (isInitializing) {
     return (
-      <div className="min-h-screen bg-siit-light flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-siit-purple font-semibold">Loading session...</p>
       </div>
     );

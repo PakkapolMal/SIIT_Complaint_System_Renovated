@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PublicHeader from './PublicHeader';
+import PublicPageShell from './layout/PublicPageShell';
 import { useAuth } from '../contexts/AuthProvider';
 import { supabase } from '../lib/supabaseClient';
 import { parseStudentEmail } from '../lib/parseStudentEmail';
@@ -73,11 +73,8 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-siit-light">
-      <PublicHeader page="signup" />
-
-      <main className="flex justify-center items-center flex-grow p-4 sm:p-8">
-        <div className="w-full max-w-3xl bg-white p-8 rounded-xl shadow-2xl">
+    <PublicPageShell page="signup">
+        <div className="w-full max-w-3xl rounded-xl border border-border bg-card p-8 shadow-md">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">
             Complete Your Profile
           </h1>
@@ -145,8 +142,7 @@ const SignupPage = () => {
             </div>
           </form>
         </div>
-      </main>
-    </div>
+    </PublicPageShell>
   );
 };
 

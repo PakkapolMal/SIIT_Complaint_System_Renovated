@@ -2,15 +2,15 @@ import React, { useEffect, useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Search, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthProvider';
-import { fetchUserHistory, getErrorMessage } from '../lib/complaintsService';
-import DashboardShell from './dashboard/DashboardShell';
+import AuthenticatedLayout from './layout/AuthenticatedLayout';
 import ComplaintsList from './dashboard/ComplaintsList';
 import { filterSubmissions } from './dashboard/complaintUtils';
+import { fetchUserHistory, getErrorMessage } from '../lib/complaintsService';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Skeleton } from './ui/skeleton';
+import { ArrowLeft, Search } from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All statuses' },
@@ -20,15 +20,13 @@ const STATUS_OPTIONS = [
 ];
 
 const UserHistory = () => {
-  const { userId } = useAuth();
-  const searchId = useId();
-  const statusId = useId();
-
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const navigate = useNavigate();
+  const { userId } = useAuth();
 
   useEffect(() => {
     if (!userId) {
@@ -43,59 +41,47 @@ const UserHistory = () => {
       .finally(() => setLoading(false));
   }, [userId]);
 
-  const filteredSubmissions = useMemo(
+  const filteredSubmissions = React.useMemo(
     () => filterSubmissions(submissions, { search, status: statusFilter }),
     [submissions, search, statusFilter]
   );
 
   return (
-    <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 sm:py-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Button asChild variant="ghost" size="sm" className="-ml-2 w-fit">
-              <Link to="/portal">
-                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                Back to dashboard
-              </Link>
-            </Button>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
-              Complaint history
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Full list of complaints you have submitted.
-            </p>
-          </div>
-        </div>
+    <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+      <div className="mx-auto max-w-6xl space-y-4">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="-ml-2 w-fit"
+          onClick={() => navigate('/portal')}
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back to dashboard
+        </Button>
 
-        {loading ? (
-          <Skeleton className="h-64 w-full rounded-lg" aria-busy="true" aria-label="Loading history" />
-        ) : error ? (
-          <Card className="border-destructive/30 bg-destructive/5" role="alert">
-            <CardHeader className="flex flex-row items-start gap-3 space-y-0">
-              <AlertCircle className="h-5 w-5 text-destructive" aria-hidden="true" />
-              <div>
-                <CardTitle className="text-base text-destructive">Error</CardTitle>
-                <CardDescription className="text-destructive/90">{error}</CardDescription>
-              </div>
-            </CardHeader>
-          </Card>
-        ) : (
-          <Card>
-            <CardHeader className="space-y-4 pb-4">
+        <Card className="shadow-md">
+          <CardHeader className="space-y-4 pb-4">
+            <div>
+              <CardTitle className="text-2xl sm:text-3xl">Complaint history</CardTitle>
               <CardDescription>
-                {filteredSubmissions.length} of {submissions.length} complaints
+                {loading
+                  ? 'Loading…'
+                  : `${filteredSubmissions.length} of ${submissions.length} complaints`}
               </CardDescription>
+            </div>
+
+            {!loading && !error && submissions.length > 0 && (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor={searchId}>Search</Label>
+                  <Label htmlFor="history-search">Search</Label>
                   <div className="relative">
                     <Search
                       className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                       aria-hidden="true"
                     />
                     <Input
-                      id={searchId}
+                      id="history-search"
                       type="search"
                       placeholder="Search complaints…"
                       value={search}
@@ -105,9 +91,9 @@ const UserHistory = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor={statusId}>Status</Label>
+                  <Label htmlFor="history-status">Status</Label>
                   <select
-                    id={statusId}
+                    id="history-status"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="flex h-10 w-full cursor-pointer rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -120,14 +106,23 @@ const UserHistory = () => {
                   </select>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
+            )}
+          </CardHeader>
+
+          <CardContent>
+            {loading ? (
+              <p className="py-8 text-center text-muted-foreground">Loading your submissions…</p>
+            ) : error ? (
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-destructive" role="alert">
+                {error}
+              </div>
+            ) : (
               <ComplaintsList submissions={filteredSubmissions} />
-            </CardContent>
-          </Card>
-        )}
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </DashboardShell>
+    </AuthenticatedLayout>
   );
 };
 

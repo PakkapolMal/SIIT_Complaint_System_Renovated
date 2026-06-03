@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthHeader from './AuthHeader';
+import AuthenticatedLayout from './layout/AuthenticatedLayout';
 import {
   deleteSubmission,
   fetchAdminSubmissions,
@@ -57,11 +57,8 @@ const AdminResponseSheet = () => {
     };
 
     return (
-        <div className="min-h-screen bg-siit-light font-sans">
-            <AuthHeader />
-
-            <main className="flex-grow p-8">
-                <div className="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-2xl">
+        <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+                <div className="mx-auto max-w-6xl rounded-xl border border-border bg-card p-6 shadow-md">
                     <h1 className="text-4xl font-extrabold text-siit-purple mb-4 border-b pb-2">
                         Manage Complaints
                     </h1>
@@ -137,8 +134,7 @@ const AdminResponseSheet = () => {
                         </div>
                     )}
                 </div>
-            </main>
-        </div>
+        </AuthenticatedLayout>
     );
 };
 

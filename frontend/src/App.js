@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ScrollToTop from './components/layout/ScrollToTop';
 import { AuthProvider, useAuth } from './contexts/AuthProvider';
 import { NavigationContext } from './contexts.js';
 
@@ -121,6 +122,7 @@ const AppRoutes = () => {
 
 const AppWrapper = () => (
   <Router>
+    <ScrollToTop />
     <AuthProvider>
       <AppRoutes />
     </AuthProvider>
