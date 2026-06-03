@@ -12,7 +12,7 @@ import {
 const AdminResponsePage = () => {
   const { submissionID } = useParams();
   const navigate = useNavigate();
-  const { userId } = useAuth();
+  const { profile, userId, userRole } = useAuth();
   const [resText, setResText] = useState('');
   const [attachment, setAttachment] = useState(null);
   const [status, setStatus] = useState('In Progress');
@@ -42,7 +42,11 @@ const AdminResponsePage = () => {
       return;
     }
 
-    if (!userId) {
+    const staffId = userRole === 'Staff'
+      ? profile?.StaffID || userId
+      : profile?.StaffID || null;
+
+    if (userRole === 'Staff' && !staffId) {
       setError('Staff ID is missing from your session.');
       setLoading(false);
       return;
@@ -51,7 +55,7 @@ const AdminResponsePage = () => {
     try {
       await submitResolution({
         submissionId: submissionID,
-        staffId: userId,
+        staffId,
         resText,
         status,
         attachment,
