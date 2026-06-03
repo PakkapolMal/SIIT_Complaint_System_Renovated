@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthProvider';
 import AuthenticatedLayout from './layout/AuthenticatedLayout';
@@ -10,7 +10,6 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { ArrowLeft, Search } from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All statuses' },
