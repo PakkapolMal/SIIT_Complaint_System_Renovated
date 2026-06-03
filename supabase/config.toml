@@ -190,9 +190,9 @@ password_requirements = ""
 
 # Configure WebAuthn relying party settings (required when passkey is enabled).
 # [auth.webauthn]
-# rp_display_name = "Supabase"
-# rp_id = "localhost"
-# rp_origins = ["http://127.0.0.1:3000"]
+# rp_display_name = "SIIT Complaint System"
+# rp_id = "siit-complaint-system.vercel.app"
+# rp_origins = ["https://siit-complaint-system.vercel.app/"]
 
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
