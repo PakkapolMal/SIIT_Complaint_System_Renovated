@@ -11,9 +11,6 @@ function PublicNav({ page = 'home' }) {
         <Button type="button" variant="outline" size="sm" onClick={() => navigate('/')}>
           Menu
         </Button>
-        {/* <Button asChild size="sm">
-          <Link to="/signup">Sign up</Link>
-        </Button> */}
       </nav>
     );
   }

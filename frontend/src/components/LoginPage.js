@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppLayout from './layout/AppLayout';
-import PublicNav from './layout/PublicNav';
+import PublicPageShell from './layout/PublicPageShell';
 import { useAuth } from '../contexts/AuthProvider';
 import { Card, CardContent } from './ui/card';
 
@@ -23,11 +22,7 @@ const LoginPage = () => {
   }, [isAuthenticated, isAdmin, profileComplete, navigate]);
 
   return (
-    <AppLayout
-      headerRight={<PublicNav page="login" />}
-      homeTo="/"
-      mainClassName="flex items-center justify-center p-4 sm:p-8"
-    >
+    <PublicPageShell page="login">
       <Card className="w-full max-w-3xl shadow-md">
         <CardContent className="p-8">
           <h1 className="mb-2 text-center text-3xl font-bold text-foreground">
@@ -50,7 +45,7 @@ const LoginPage = () => {
             type="button"
             onClick={signInWithGoogle}
             disabled={isLoading}
-            className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-lg border border-input bg-card px-4 py-3 text-lg font-medium text-foreground shadow-sm transition-colors duration-200 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex w-full min-h-11 cursor-pointer items-center justify-center gap-3 rounded-lg border border-input bg-card px-4 py-3 text-lg font-medium text-foreground shadow-sm transition-colors duration-200 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -62,7 +57,7 @@ const LoginPage = () => {
           </button>
         </CardContent>
       </Card>
-    </AppLayout>
+    </PublicPageShell>
   );
 };
 

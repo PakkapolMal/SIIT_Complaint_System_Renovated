@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppLayout from './layout/AppLayout';
-import PublicNav from './layout/PublicNav';
+import PublicPageShell from './layout/PublicPageShell';
 import { useAuth } from '../contexts/AuthProvider';
 import { supabase } from '../lib/supabaseClient';
 import { parseStudentEmail } from '../lib/parseStudentEmail';
@@ -74,11 +73,7 @@ const SignupPage = () => {
   };
 
   return (
-    <AppLayout
-      headerRight={<PublicNav page="signup" />}
-      homeTo="/"
-      mainClassName="flex items-center justify-center p-4 sm:p-8"
-    >
+    <PublicPageShell page="signup">
         <div className="w-full max-w-3xl rounded-xl border border-border bg-card p-8 shadow-md">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">
             Complete Your Profile
@@ -147,7 +142,7 @@ const SignupPage = () => {
             </div>
           </form>
         </div>
-    </AppLayout>
+    </PublicPageShell>
   );
 };
 

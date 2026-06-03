@@ -5,6 +5,8 @@ import AppLayout from './layout/AppLayout';
 import AuthenticatedLayout from './layout/AuthenticatedLayout';
 import PublicNav from './layout/PublicNav';
 import { fetchSubmissionDetails, getErrorMessage } from '../lib/complaintsService';
+import ScalableImage from './ui/ScalableImage';
+import { layout } from '../lib/designTokens';
 
 function isImageSource(value) {
   if (!value) {
@@ -75,10 +77,9 @@ function SubmissionDetailContent({
               <div key={index} className="rounded-md border border-border bg-muted/30 p-4">
                 <p className="mb-2 text-sm font-semibold text-foreground">{label}</p>
                 {imageSrc ? (
-                  <img
+                  <ScalableImage
                     src={imageSrc}
-                    alt="Submission attachment"
-                    className="max-w-md rounded-lg border border-border"
+                    alt={`Attachment for ${label}`}
                   />
                 ) : (
                   <p className="whitespace-pre-wrap text-foreground">{answer.AnswerText}</p>
@@ -110,10 +111,9 @@ function SubmissionDetailContent({
                 <div className="mt-4">
                   <h4 className="mb-2 font-semibold text-foreground">Attachment:</h4>
                   {isImageSource(resolution.AttachmentPath) ? (
-                    <img
+                    <ScalableImage
                       src={resolution.AttachmentPath}
                       alt="Resolution attachment"
-                      className="max-w-md rounded-lg border border-border"
                     />
                   ) : (
                     <a
@@ -174,22 +174,24 @@ const SubmissionDetail = ({ embedded = false }) => {
     }
   };
 
-  const wrapLayout = (children, mainClassName = 'p-4 sm:p-8') => {
+  const wrapLayout = (children) => {
     if (embedded) {
       return children;
     }
 
     if (isAuthenticated) {
       return (
-        <AuthenticatedLayout mainClassName={mainClassName}>
-          {children}
+        <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+          <div className={layout.container}>{children}</div>
         </AuthenticatedLayout>
       );
     }
 
     return (
-      <AppLayout headerRight={<PublicNav page="home" />} homeTo="/" mainClassName={mainClassName}>
-        {children}
+      <AppLayout headerRight={<PublicNav page="home" />} homeTo="/">
+        <div className={layout.container}>
+          <div className="py-8 sm:py-10 lg:py-12">{children}</div>
+        </div>
       </AppLayout>
     );
   };
