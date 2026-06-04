@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import AuthenticatedLayout from './layout/AuthenticatedLayout';
+import { layout } from '../lib/designTokens';
 import { Card, CardContent } from './ui/card';
 
 const AdminMenu = () => {
   return (
-    <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+    <AuthenticatedLayout mainClassName={layout.mainPadding}>
       <Card className="mx-auto max-w-3xl shadow-md">
         <CardContent className="p-6 sm:p-8">
           <h2 className="mb-2 text-3xl font-bold text-foreground">

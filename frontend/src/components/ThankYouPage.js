@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthProvider';
 import AuthenticatedLayout from './layout/AuthenticatedLayout';
+import { layout } from '../lib/designTokens';
+import { cn } from '../lib/utils';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 
@@ -16,7 +18,9 @@ const ThankYouPage = () => {
   }
 
   return (
-    <AuthenticatedLayout mainClassName="flex items-center justify-center p-4 sm:p-8">
+    <AuthenticatedLayout
+      mainClassName={cn('flex items-center justify-center', layout.mainPadding)}
+    >
       <Card className="w-full max-w-3xl text-center shadow-md">
         <CardContent className="p-8 sm:p-10">
           <h1 className="mb-4 text-2xl font-bold text-foreground">

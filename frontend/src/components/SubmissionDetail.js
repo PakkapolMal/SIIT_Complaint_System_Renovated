@@ -181,7 +181,7 @@ const SubmissionDetail = ({ embedded = false }) => {
 
     if (isAuthenticated) {
       return (
-        <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+        <AuthenticatedLayout mainClassName={layout.mainPadding}>
           <div className={layout.container}>{children}</div>
         </AuthenticatedLayout>
       );

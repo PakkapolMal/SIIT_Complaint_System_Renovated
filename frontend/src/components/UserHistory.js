@@ -6,6 +6,7 @@ import AuthenticatedLayout from './layout/AuthenticatedLayout';
 import ComplaintsList from './dashboard/ComplaintsList';
 import { filterSubmissions } from './dashboard/complaintUtils';
 import { fetchUserHistory, getErrorMessage } from '../lib/complaintsService';
+import { layout } from '../lib/designTokens';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
@@ -46,7 +47,7 @@ const UserHistory = () => {
   );
 
   return (
-    <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+    <AuthenticatedLayout mainClassName={layout.mainPadding}>
       <div className="mx-auto max-w-6xl space-y-4">
         <Button
           type="button"

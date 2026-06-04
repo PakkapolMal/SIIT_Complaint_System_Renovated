@@ -12,6 +12,8 @@ import { supabase } from '../lib/supabaseClient';
 import { getErrorMessage } from '../lib/authErrors';
 import { isAllowedSiitEmail } from '../lib/parseStudentEmail';
 import { resolveUserProfile } from '../lib/resolveUserProfile';
+import { layout } from '../lib/designTokens';
+import { cn } from '../lib/utils';
 
 const AuthContext = createContext(null);
 
@@ -293,7 +295,12 @@ export function AuthProvider({ children }) {
 
   if (isInitializing) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div
+        className={cn(
+          'flex min-h-screen items-center justify-center bg-background',
+          layout.screenPaddingX
+        )}
+      >
         <p className="text-siit-purple font-semibold">Loading session...</p>
       </div>
     );
