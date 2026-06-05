@@ -87,9 +87,9 @@ npx supabase db push
 | Academic Services and Registration Division | 1 | Academics |
 | Student Affairs and Alumni Relations Division (SA&AR) | 2 | Physical or Mental Abusements |
 | Building and Ground Division (BG) | 3 | Area, Facilities, Amenities, and Welfare |
-| ALL | 4 | Faculty Systems and Staff Contact |
-| Other | 4 only | Faculty Systems and Staff Contact |
 | Admission and Public Relations Division (AD&PR) | 5 | Follow ups, Updates, and News |
+| **Every division above + Other** | **4** | Faculty Systems and Staff Contact (shared) |
+| Other | 4 only | No access to topics 1, 2, 3, or 5 |
 
 Anonymous users on `/overall-view` can still **read** topics 3, 4, and 5; staff management is scoped by division via `topic_staff_access` and RLS.
 

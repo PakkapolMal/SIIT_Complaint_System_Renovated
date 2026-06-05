@@ -168,6 +168,21 @@ async function userCanManageSubmission(
   }
 
   const topicId = submission.TopicID;
+  const allowedDivisions = [
+    'Academic Services and Registration Division',
+    'Student Affairs and Alumni Relations Division (SA&AR)',
+    'Building and Ground Division (BG)',
+    'Admission and Public Relations Division (AD&PR)',
+    'Other',
+  ];
+
+  if (!staff.Division || !allowedDivisions.includes(staff.Division)) {
+    return false;
+  }
+
+  if (topicId === 4) {
+    return true;
+  }
 
   const { data: access } = await adminClient
     .from('topic_staff_access')

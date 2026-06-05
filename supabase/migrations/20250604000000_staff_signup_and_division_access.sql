@@ -9,8 +9,6 @@ INSERT INTO public.topic_staff_access ("TopicID", "Division") VALUES
     (1, 'Academic Services and Registration Division'),
     (2, 'Student Affairs and Alumni Relations Division (SA&AR)'),
     (3, 'Building and Ground Division (BG)'),
-    (4, 'ALL'),
-    (4, 'Other'),
     (5, 'Admission and Public Relations Division (AD&PR)');
 
 -- ---------------------------------------------------------------------------
@@ -26,7 +24,6 @@ AS $$
            'Academic Services and Registration Division',
            'Student Affairs and Alumni Relations Division (SA&AR)',
            'Building and Ground Division (BG)',
-           'ALL',
            'Admission and Public Relations Division (AD&PR)',
            'Other'
        );
@@ -94,6 +91,26 @@ $$;
 
 REVOKE ALL ON FUNCTION public.generate_staff_id_from_email(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.generate_staff_id_from_email(text) TO authenticated, service_role;
+
+-- Topic 4 is managed by every registered staff division; topics 1/2/3/5 use topic_staff_access.
+CREATE OR REPLACE FUNCTION public.staff_can_access_topic(p_topic_id bigint)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+    SELECT public.staff_division_allowed(public.current_staff_division())
+       AND (
+           p_topic_id = 4
+           OR EXISTS (
+               SELECT 1
+               FROM public.topic_staff_access tsa
+               WHERE tsa."TopicID" = p_topic_id
+                 AND tsa."Division" = public.current_staff_division()
+           )
+       );
+$$;
 
 -- Staff only manage submissions for topics mapped to their division (anon public topics unchanged)
 CREATE OR REPLACE FUNCTION public.can_access_submission(p_submission_id bigint)
