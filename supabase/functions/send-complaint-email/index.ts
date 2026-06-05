@@ -168,9 +168,6 @@ async function userCanManageSubmission(
   }
 
   const topicId = submission.TopicID;
-  if (![1, 2].includes(topicId)) {
-    return true;
-  }
 
   const { data: access } = await adminClient
     .from('topic_staff_access')

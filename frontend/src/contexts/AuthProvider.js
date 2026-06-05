@@ -67,8 +67,13 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    if (resolved.userRole === 'Admin' || resolved.userRole === 'Staff') {
+    if (resolved.userRole === 'Admin') {
       navigate('/admin', { replace: true });
+      return;
+    }
+
+    if (resolved.userRole === 'Staff') {
+      navigate(resolved.profileComplete ? '/admin' : '/signup', { replace: true });
       return;
     }
 

@@ -20,20 +20,32 @@ function GoogleIcon() {
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { signInWithGoogle, isLoading, authError, isAuthenticated, isAdmin, profileComplete } = useAuth();
+  const {
+    signInWithGoogle,
+    isLoading,
+    authError,
+    isAuthenticated,
+    userRole,
+    profileComplete,
+  } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated) {
       return;
     }
 
-    if (isAdmin) {
+    if (userRole === 'Admin') {
       navigate('/admin', { replace: true });
       return;
     }
 
+    if (userRole === 'Staff') {
+      navigate(profileComplete ? '/admin' : '/signup', { replace: true });
+      return;
+    }
+
     navigate(profileComplete ? '/portal' : '/signup', { replace: true });
-  }, [isAuthenticated, isAdmin, profileComplete, navigate]);
+  }, [isAuthenticated, userRole, profileComplete, navigate]);
 
   return (
     <PublicPageShell page="login">

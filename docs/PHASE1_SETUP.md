@@ -66,24 +66,36 @@ Staff and students use **different Google email domains**:
 | Student | `@g.siit.tu.ac.th` | `6622781027@g.siit.tu.ac.th` |
 | Staff | `@siit.tu.ac.th` (no `g.`) | `your.name@siit.tu.ac.th` |
 
-You **cannot** test staff flows with a `@g.siit.tu.ac.th` student account. Use a real SIIT staff Google account, or register one for testing.
+You **cannot** test staff flows with a `@g.siit.tu.ac.th` student account. Use a real SIIT staff Google account.
 
-### Option A: Register your staff email in the database (recommended)
+### Staff self-signup (default)
 
-In Supabase Dashboard → SQL Editor, add the Google address you can actually sign in with:
+1. Sign in with Google using your `@siit.tu.ac.th` address.
+2. You are redirected to `/signup` to **select your division** (SIIT office/division, not student academic departments like BA/CE).
+3. After saving, you can access `/admin` and only see complaints for topics your division manages.
 
-```sql
-INSERT INTO public.staff ("StaffID", "Division", "StaffName", "Email")
-VALUES ('901', 'Academic Affairs', 'Your Name', 'your.name@siit.tu.ac.th')
-ON CONFLICT ("StaffID") DO UPDATE
-SET "Division" = EXCLUDED."Division",
-    "StaffName" = EXCLUDED."StaffName",
-    "Email" = EXCLUDED."Email";
+Apply migration `20250604000000_staff_signup_and_division_access.sql` before testing:
+
+```bash
+npx supabase db push
 ```
 
-Then sign in with Google using `your.name@siit.tu.ac.th`. On first login the app links `staff.UUID` to your auth user automatically.
+### Division → complaint topic access (manage complaints)
 
-To also test the admin dashboard, add an admin row **after** the first staff login (copy your user UUID from Authentication → Users):
+| `staff.Division` | Topic ID | Topic name (seed) |
+|------------------|----------|---------------------|
+| Academic Services and Registration Division | 1 | Academics |
+| Student Affairs and Alumni Relations Division (SA&AR) | 2 | Physical or Mental Abusements |
+| Building and Ground Division (BG) | 3 | Area, Facilities, Amenities, and Welfare |
+| ALL | 4 | Faculty Systems and Staff Contact |
+| Other | 4 only | Faculty Systems and Staff Contact |
+| Admission and Public Relations Division (AD&PR) | 5 | Follow ups, Updates, and News |
+
+Anonymous users on `/overall-view` can still **read** topics 3, 4, and 5; staff management is scoped by division via `topic_staff_access` and RLS.
+
+### Optional: grant full admin role
+
+After staff signup, promote a user to full admin (all topics) in SQL Editor:
 
 ```sql
 INSERT INTO public.admin ("UUID", "Role", "StaffID")
@@ -95,18 +107,9 @@ ON CONFLICT ("UUID") DO NOTHING;
 
 Sign out and sign back in to pick up the admin role.
 
-### Option B: Use seeded placeholder emails
+### Dev seed staff (optional)
 
-`supabase/seed.sql` includes placeholder staff rows such as `academic.affairs@siit.tu.ac.th`. These only work if that exact mailbox exists in Google Workspace and you can OAuth as it. For most dev setups, prefer Option A with your own `@siit.tu.ac.th` address.
-
-### Division access for sensitive topics
-
-| Topic | Required `staff.Division` |
-|-------|---------------------------|
-| 1 — Academics | `Academic Affairs` |
-| 2 — Abuse | `Student Affairs` |
-
-Other staff divisions can manage public topics (3–5) but not Topics 1 or 2 unless their division matches.
+`supabase/seed.sql` includes placeholder staff rows with pre-set divisions. These only work if you can OAuth as those exact mailboxes. For most dev setups, use self-signup with your own `@siit.tu.ac.th` account.
 
 ## 8. Apply latest migrations (required for complaint submit)
 
@@ -116,4 +119,4 @@ If student complaint submit fails with `42501` on `submission`, push all migrati
 npx supabase db push
 ```
 
-The latest migration (`20250601000005_submission_rpc.sql`) adds secure RPC functions `create_submission` and `create_user_answer` that resolve the student/staff profile server-side and bypass brittle INSERT RLS checks.
+The latest migrations add secure RPC functions (`create_submission`, `create_user_answer`, `complete_staff_profile`) and division-based staff access to complaints.

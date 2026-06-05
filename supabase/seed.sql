@@ -46,9 +46,9 @@ SELECT setval(pg_get_serial_sequence('public.question', 'QID'), (SELECT COALESCE
 
 -- Pre-seeded staff (UUID linked on first Google login via Email match)
 INSERT INTO public.staff ("StaffID", "Division", "StaffName", "Email") VALUES
-    ('101', 'Academic Affairs', 'Academic Affairs Staff', 'academic.affairs@siit.tu.ac.th'),
-    ('102', 'Student Affairs', 'Student Affairs Staff', 'student.affairs@siit.tu.ac.th'),
-    ('103', 'Building', 'Building Staff', 'building@siit.tu.ac.th'),
-    ('104', 'Registration', 'Registration Staff', 'registration@siit.tu.ac.th'),
-    ('105', 'Finance', 'Finance Staff', 'finance@siit.tu.ac.th')
+    ('101', 'Academic Services and Registration Division', 'Academic Services Staff', 'academic.affairs@siit.tu.ac.th'),
+    ('102', 'Student Affairs and Alumni Relations Division (SA&AR)', 'Student Affairs Staff', 'student.affairs@siit.tu.ac.th'),
+    ('103', 'Building and Ground Division (BG)', 'Building Staff', 'building@siit.tu.ac.th'),
+    ('104', 'ALL', 'General Staff', 'registration@siit.tu.ac.th'),
+    ('105', 'Admission and Public Relations Division (AD&PR)', 'Admissions Staff', 'finance@siit.tu.ac.th')
 ON CONFLICT ("StaffID") DO NOTHING;

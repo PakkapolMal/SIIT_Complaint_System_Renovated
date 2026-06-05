@@ -24,6 +24,14 @@ function isStudentProfileComplete(studentRow) {
   return studentRow.Year != null && Boolean(studentRow.Department);
 }
 
+function isStaffProfileComplete(staffRow) {
+  if (!staffRow) {
+    return false;
+  }
+
+  return Boolean(staffRow.Division);
+}
+
 function throwIfSupabaseError(error, fallback) {
   if (error) {
     throw toError(error, fallback);
@@ -100,24 +108,37 @@ export async function resolveUserProfile(user) {
   }
 
   if (isStaffEmail(email)) {
-    const { data: staffRow, error: staffLookupError } = await supabase
+    const { data: staffByEmail, error: staffByEmailError } = await supabase
       .from('staff')
       .select('*')
       .eq('Email', email)
       .maybeSingle();
 
-    throwIfSupabaseError(staffLookupError, 'Failed to load staff profile.');
+    throwIfSupabaseError(staffByEmailError, 'Failed to load staff profile.');
+
+    let staffRow = staffByEmail;
+
+    if (!staffRow) {
+      const { data: staffByUuid, error: staffByUuidError } = await supabase
+        .from('staff')
+        .select('*')
+        .eq('UUID', user.id)
+        .maybeSingle();
+
+      throwIfSupabaseError(staffByUuidError, 'Failed to load staff profile.');
+      staffRow = staffByUuid;
+    }
 
     if (!staffRow) {
       return {
-        userRole: null,
+        userRole: 'Staff',
         profile: null,
         userId: null,
-        userName: null,
+        userName: getDisplayName(user),
         studentId: null,
         staffDivision: null,
         profileComplete: false,
-        authError: 'Your staff account is not registered. Contact an administrator.',
+        authError: null,
       };
     }
 
@@ -141,6 +162,8 @@ export async function resolveUserProfile(user) {
       }
     }
 
+    const profileComplete = isStaffProfileComplete(activeStaff);
+
     return {
       userRole: 'Staff',
       profile: activeStaff,
@@ -148,7 +171,7 @@ export async function resolveUserProfile(user) {
       userName: activeStaff.StaffName || getDisplayName(user),
       studentId: null,
       staffDivision: activeStaff.Division,
-      profileComplete: true,
+      profileComplete,
       authError: null,
     };
   }
@@ -227,4 +250,4 @@ export async function resolveUserProfile(user) {
   };
 }
 
-export { isStudentProfileComplete };
+export { isStudentProfileComplete, isStaffProfileComplete };
