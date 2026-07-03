@@ -1,128 +1,98 @@
-# 📢 SIIT Complaint System
+# SIIT Complaint System
 
-A web-based complaint tracking and management system designed for SIIT students and administrators. This application allows students to file complaints or suggestions and track their status, while administrators can review, update, and resolve issues efficiently.
+**Deployed web:** [https://siit-complaint-system.vercel.app](https://siit-complaint-system.vercel.app)
 
-🧑‍💻 Team & Contribution
-Project by: Thanutch Mel Pholsukcharoen, Pakkapol Maluangnont, and Phunyaphat Vijitrapornphan
+The SIIT Complaint System is a web application for submitting, tracking, and managing complaints or suggestions from the SIIT community. Students can file structured reports and monitor progress, while authorized staff and administrators can review submissions, update statuses, and record official responses.
 
-🚀 Features
+This project began as a team-built legacy system by Thanutch Mel Pholsukcharoen, Pakkapol Maluangnont, and Phunyaphat Vijitrapornphan. I later renovated the project by modernizing the frontend, migrating the active application flow to Supabase, adding Google-based SIIT authentication, improving the student and staff dashboards, and preparing the app for Vercel deployment.
 
-📊 Overall
-- User signup and login with hashed passwords
-- The complaint form dynamically generates questions based on the selected topic.
--  public, anonymized view shows the status of all non-sensitive complaints (hides "Academics" and "Abuse" topics).
-- An SQL trigger automatically creates an audit log in a `status_log` table every time a complaint's status is changed, tracking the old and new values.
+## Current Features
 
-🎓 For Students
-- Secure Authentication: Sign up and log in using Student ID.
-- File Complaints: Submit complaints with categories, details, and file attachments.
-- Track Status: View the history and live status of submitted complaints (Pending, In Progress, Resolved).
-- Anonymous View: View a public list of complaints without revealing personal identities.
+- SIIT Google sign-in for `@g.siit.tu.ac.th` student accounts and `@siit.tu.ac.th` staff accounts
+- Role-aware routing for students, staff, and administrators
+- Student profile completion with year and department details
+- Staff profile completion with division-based access
+- Dynamic complaint topics and questions loaded from Supabase
+- Support for text answers, dropdowns, checkboxes, and file attachments
+- Student dashboard with complaint history, filtering, and status summaries
+- Public anonymized complaint board with detail pages
+- Staff/admin complaint management with status updates, responses, attachments, and deletion
+- Email notification support for new submissions and status changes through Supabase Edge Functions
+- Responsive React interface styled with Tailwind CSS and reusable UI components
 
-🛡️ For Administrators
-- Dashboard: Overview of all incoming complaints.
-- Management: Update complaint status and provide official resolutions.
-- Data Visualization: View summary statistics of issues.
+## Tech Stack
 
-🛠️ Tech Stack
+- React 18
+- Tailwind CSS
+- Supabase Auth, Database, Storage, RPCs (Remote Procedure Calls), and Edge Functions
+- Vercel deployment
 
-Frontend:
-- React.js (v18)
-- Tailwind CSS (Styling)
-- React Router (Navigation)
+## Getting Started
 
-Backend:
-- PHP (Vanilla)
-- MySQL (Database)
-- Apache Server (via MAMP)
+### Prerequisites
 
-⚙️ Prerequisites
+- Node.js and npm
+- A Supabase project configured with the required complaint-system schema, policies, RPCs, storage buckets, and Edge Functions
+- Google OAuth configured in Supabase Auth for SIIT accounts
 
-Before you begin, ensure you have the following installed:
-- Node.js & npm (For the React frontend)
-- MAMP (or XAMPP/WAMP) for the PHP/MySQL server.
+### Frontend Setup
 
-📦 Installation & Setup
+1. Install frontend dependencies:
 
-1. Database Setup (MySQL)
-	1. Open MAMP and start the servers.
-	2. Go to phpMyAdmin (http://localhost/phpMyAdmin).
-	3. Create a new database named `projectsiit`.
-	4. Import the `projectsiit.sql` file provided in the database/ folder of this repo.
-		Note: This sets up the tables for Students, Admins, Submissions, etc.
+   ```bash
+   cd frontend
+   npm install
+   ```
 
-2. Backend Setup (PHP)
-	1. Locate your MAMP document root (usually C:\MAMP\htdocs on Windows or 		/Applications/MAMP/htdocs on Mac).
-	2. Create a folder named siit-complaint-system.
-	3. Copy the backend folder from this project into that folder.
-		- The path should look like: htdocs/siit-complaint-system/backend/
-	4. Open backend/config.php and check your database credentials:
-		define('DB_SERVER', 'localhost');
-		define('DB_USERNAME', 'root');
-		define('DB_PASSWORD', 'root'); // Default MAMP password
-		define('DB_NAME', 'projectsiit');
-	5. Inside the `backend/` directory, create two new, empty folders (if not exist):
-    		`backend/uploads`
-    		`backend/resolutions`
-    		(The PHP scripts need these folders to exist to save files).
+2. Set the frontend environment variables shown in `frontend/.env.example`:
 
-3. Frontend Setup (React)
-	1. Open a terminal and navigate to the frontend folder.
-		* **(macOS):** `cd /Applications/MAMP/htdocs/siit-complaint-system/frontend`
-   		* **(Windows):** `cd C:\MAMP\htdocs\siit-complaint-system\frontend`
-	2. Install all the required Node.js packages:
-		npm install
-	3. Start the React development server:
-		npm start
-	4. The app should open automatically at http://localhost:3000.
+   ```bash
+   REACT_APP_SUPABASE_URL=your-supabase-project-url
+   REACT_APP_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
 
-Your computer is now running both servers:
-	* **Backend API:** `http://localhost/siit-complaint-system/backend/` (or `http://localhost:8888/siit-complaint-system/backend/` if using MAMP's default port)
-	* **Frontend App:** `http://localhost:3000`
+3. Start the development server:
 
-🔑 Default Credentials
+   ```bash
+   npm start
+   ```
 
-To log in as an administrator, you must first ensure your `admin` table has a user with a **hashed password**.
+4. Open the local React app in your browser.
 
-1.  Use the `backend/hash_password.php` tool to generate a hash for a password (e.g., `password123`).
-2.  Copy the resulting hash.
-3.  Go to phpMyAdmin, open the `admin` table, and paste the hash into the `Password` column for your admin user.
+### Supabase Functions
 
-You can now log in with that user's `AdminID` and the plain-text password you hashed.
+The repository includes Edge Functions for:
 
-📂 Project Structure
+- rejecting non-SIIT authentication domains
+- sending complaint submission and status-update notifications
 
-siit-complaint-system/
-├── backend/              # PHP API files
-│   ├── config.php        # Database connection & CORS
-│   ├── authenticate.php  # Login logic
-│   ├── signup.php        # Registration logic
-│   └── uploads/          # Stored images/attachments
-├── frontend/             # React Application
-│   ├── public/
-│   └── src/
-│       ├── components/   # Reusable components & Full page views 
-│       └── contexts.js   # Auth state management
-└── database/
-    └── projectsiit.sql   		# SQL export file
-    └── populate_10m_students.sql   	# SQL scalability stress test script
+These functions require the matching Supabase secrets and deployed function configuration before notification flows will work in production.
 
-🐛 Troubleshooting
-"Network Error" or 500 Error?
-	Ensure MAMP is running.
-	Check if the backend path is correct: http://localhost/siit-complaint-system/backend/.
-	Verify config.php credentials match your MAMP MySQL settings.
+## Application Flow
 
-CORS Issues?
-	Ensure config.php includes the Access-Control-Allow-Origin headers pointing to http://localhost:3000.
+### Students
 
-⚡ Scalability & Performance Testing
-This architecture is designed to handle enterprise-level data loads. To demonstrate the system's robustness, I have included a stress-test script capable of populating the database with 10 Million records.
+1. Sign in with an SIIT student Google account.
+2. Complete the profile with year and department.
+3. File a complaint by selecting a topic and answering the generated questions.
+4. Receive a submission ID and track progress from the student dashboard.
+5. View public anonymized complaint statuses from the public board.
 
-Stress Test Script: database/populate_10m_students.sql
+### Staff and Administrators
 
-How to Run the Stress Test:
-	1. Import the populate_10m_students.sql file into your MySQL database.
-	2. Run the following SQL command:
-		CALL sp_GenerateStudents();
-	3. Note: Execution time depends on hardware performance (approx. 10-15 mins on standard MAMP setup).
+1. Sign in with an SIIT staff Google account.
+2. Complete the staff profile when required.
+3. Review submitted complaints from the admin dashboard.
+4. Open complaint details, update status, add an official response, and attach supporting files.
+5. Trigger notification emails when submissions are created or statuses change.
+
+## Repository Notes
+
+- The active frontend uses Supabase directly for authentication, data access, storage, and server-side functions.
+- Deployment routing for the single-page React app is configured for Vercel.
+
+## Credits
+
+Original legacy system by Thanutch Mel Pholsukcharoen, Pakkapol Maluangnont, and Phunyaphat Vijitrapornphan.
+
+Renovation and current implementation work by me, including the Supabase migration, authentication flow, dashboard redesign, notification workflow, and deployed web version.
