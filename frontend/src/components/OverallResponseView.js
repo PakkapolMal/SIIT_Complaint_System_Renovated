@@ -6,6 +6,7 @@ import PublicNav from './layout/PublicNav';
 import AuthNav from './layout/AuthNav';
 import { useHomePath } from './layout/useHomePath';
 import { fetchPublicSubmissions, getErrorMessage } from '../lib/complaintsService';
+import { layout } from '../lib/designTokens';
 
 const OverallResponseView = () => {
   const [submissions, setSubmissions] = useState([]);
@@ -43,7 +44,7 @@ const OverallResponseView = () => {
     <AppLayout
       headerRight={isAuthenticated ? <AuthNav /> : <PublicNav page="home" />}
       homeTo={homeTo}
-      mainClassName="p-4 sm:p-8"
+      mainClassName={layout.mainPadding}
     >
       <div className="mx-auto max-w-6xl rounded-xl border border-border bg-card p-6 shadow-md">
         <h1 className="mb-4 border-b border-border pb-2 text-3xl font-bold text-foreground sm:text-4xl">

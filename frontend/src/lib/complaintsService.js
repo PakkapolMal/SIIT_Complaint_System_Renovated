@@ -225,6 +225,13 @@ async function uploadEvidenceFile(submissionId, questionId, file) {
   return data.publicUrl;
 }
 
+async function notifyComplaintEmail(payload) {
+  const { error } = await supabase.functions.invoke('send-complaint-email', { body: payload });
+  if (error) {
+    console.warn('Complaint notification email failed:', error.message);
+  }
+}
+
 async function uploadResolutionFile(submissionId, file) {
   const extension = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
   const objectPath = `${submissionId}/resolution_${Date.now()}.${extension}`;
@@ -269,10 +276,22 @@ export async function submitComplaint({ topicId, answers, files }) {
     throwIfError(answerError, 'Failed to save complaint answers.');
   }
 
+  await notifyComplaintEmail({
+    event: 'submission_created',
+    submission_id: submissionId,
+  });
+
   return submissionId;
 }
 
-export async function submitResolution({ submissionId, staffId, resText, status, attachment }) {
+export async function submitResolution({
+  submissionId,
+  staffId,
+  resText,
+  status,
+  attachment,
+  oldStatus,
+}) {
   let resUrl = null;
 
   if (attachment) {
@@ -296,6 +315,12 @@ export async function submitResolution({ submissionId, staffId, resText, status,
     .eq('SubmissionID', submissionId);
 
   throwIfError(statusError, 'Failed to update submission status.');
+
+  await notifyComplaintEmail({
+    event: 'status_changed',
+    submission_id: Number(submissionId),
+    old_status: oldStatus,
+  });
 }
 
 export async function deleteSubmission(submissionId) {

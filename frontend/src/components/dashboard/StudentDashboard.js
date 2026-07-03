@@ -17,6 +17,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Skeleton } from '../ui/skeleton';
+import { layout } from '../../lib/designTokens';
+import { cn } from '../../lib/utils';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All statuses' },
@@ -60,7 +62,7 @@ function StudentDashboard() {
 
   return (
     <DashboardShell>
-      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 sm:py-8">
+      <div className={cn(layout.container, 'space-y-6 py-6 sm:py-8')}>
         <section aria-labelledby="welcome-heading" className="space-y-2">
           <h1
             id="welcome-heading"

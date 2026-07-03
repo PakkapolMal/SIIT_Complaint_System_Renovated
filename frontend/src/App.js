@@ -18,10 +18,14 @@ import SubmissionDetail from './components/SubmissionDetail';
 import AdminResponsePage from './components/AdminResponsePage';
 
 function ProtectedRoute({ children, requireAdmin = false, requireStudent = false, requireProfileComplete = false }) {
-  const { isAuthenticated, isAdmin, isStudent, profileComplete } = useAuth();
+  const { isAuthenticated, isAdmin, isStudent, userRole, profileComplete } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (requireAdmin && userRole === 'Staff' && !profileComplete) {
+    return <Navigate to="/signup" replace />;
   }
 
   if (requireAdmin && !isAdmin) {
@@ -33,6 +37,10 @@ function ProtectedRoute({ children, requireAdmin = false, requireStudent = false
   }
 
   if (requireProfileComplete && isStudent && !profileComplete) {
+    return <Navigate to="/signup" replace />;
+  }
+
+  if (requireProfileComplete && userRole === 'Staff' && !profileComplete) {
     return <Navigate to="/signup" replace />;
   }
 

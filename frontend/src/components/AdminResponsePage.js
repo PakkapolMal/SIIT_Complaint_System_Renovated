@@ -8,6 +8,7 @@ import {
   getErrorMessage,
   submitResolution,
 } from '../lib/complaintsService';
+import { layout } from '../lib/designTokens';
 
 const AdminResponsePage = () => {
   const { submissionID } = useParams();
@@ -74,7 +75,7 @@ const AdminResponsePage = () => {
   };
 
   return (
-    <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+    <AuthenticatedLayout mainClassName={layout.mainPadding}>
       <SubmissionDetail embedded />
       <div className="mx-auto -mt-2 max-w-4xl rounded-xl border border-border border-t-4 border-t-primary bg-card p-6 shadow-md sm:p-8">
         <h1 className="mb-6 text-3xl font-bold text-foreground">Administrator response</h1>

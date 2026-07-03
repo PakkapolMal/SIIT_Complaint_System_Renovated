@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthProvider';
 import AuthenticatedLayout from './layout/AuthenticatedLayout';
+import { layout } from '../lib/designTokens';
 import {
   fetchQuestionsByTopic,
   fetchTopics,
@@ -131,7 +132,7 @@ const ComplaintStart = () => {
     };
 
     return (
-        <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+        <AuthenticatedLayout mainClassName={layout.mainPadding}>
                 <div className="mx-auto max-w-4xl rounded-xl border border-border bg-card p-6 shadow-md sm:p-8">
                     <button onClick={() => navigate(-1)} className="text-siit-purple hover:underline mb-4">
                         &larr; Back to Menu

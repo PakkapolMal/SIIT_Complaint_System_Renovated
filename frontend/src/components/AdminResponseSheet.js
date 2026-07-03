@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthenticatedLayout from './layout/AuthenticatedLayout';
+import { layout } from '../lib/designTokens';
 import {
   deleteSubmission,
   fetchAdminSubmissions,
@@ -57,7 +58,7 @@ const AdminResponseSheet = () => {
     };
 
     return (
-        <AuthenticatedLayout mainClassName="p-4 sm:p-8">
+        <AuthenticatedLayout mainClassName={layout.mainPadding}>
                 <div className="mx-auto max-w-6xl rounded-xl border border-border bg-card p-6 shadow-md">
                     <h1 className="text-4xl font-extrabold text-siit-purple mb-4 border-b pb-2">
                         Manage Complaints
